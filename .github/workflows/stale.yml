@@ -4,11 +4,22 @@ on:
   schedule:
   - cron: "0 0 * * *"
 
+permissions:  # added using https://github.com/step-security/secure-workflows
+  contents: read
+
 jobs:
   stale:
+    permissions:
+      issues: write  # for actions/stale to close stale issues
+      pull-requests: write  # for actions/stale to close stale PRs
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/stale@v5
+    - name: Harden Runner
+      uses: step-security/harden-runner@ebacdc22ef6c2cfb85ee5ded8f2e640f4c776dd5 # v2.0.0
+      with:
+        egress-policy: audit # TODO: change to 'egress-policy: block' after couple of runs
+
+    - uses: actions/stale@99b6c709598e2b0d0841cd037aaf1ba07a4410bd # v5.2.0
       with:
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         stale-issue-message: >
